@@ -11,9 +11,9 @@ Table information is returned as [Block](API_Block.md) objects from a call to [A
 
 In this example, you will use the functions: 
 + `get_table_csv_results` – Calls [AnalyzeDocument](API_AnalyzeDocument.md), and builds a map of tables that are detected in the document\. Creates a CSV representation of all detected tables\.
-+ `generate_table_csv` – Generates the CSV file for an individual table\.
-+ `get_rows_columns_map` – Gets the rows and columns from the map\.
-+ `get_text` – Gets the text from a cell\.
++ `generateTableCsv` – Generates the CSV file for an individual table\.
++ `getRowsColumnMap` – Gets the rows and columns from the map\.
++ `getText` – Gets the text from a cell\.
 
 **To export tables into a CSV file**
 
@@ -40,7 +40,12 @@ object AwsModel {
    }
 
 
-   case class MessageResponse(JobId: String,  API: String, Status: String,Timestamp: Long, JobTag: Option[String], DocumentLocation: DocumentLocation)
+   case class MessageResponse(
+                              JobId: String,  API: String, 
+                              Status: String,Timestamp: Long, 
+                              JobTag: Option[String], 
+                              DocumentLocation: DocumentLocation
+                             )
 
    object AwsModelJsonProtocol extends DefaultJsonProtocol {
       implicit val documentLocationFormat = jsonFormat2(DocumentLocation)
@@ -48,7 +53,8 @@ object AwsModel {
 
    }
 
-   def convertBlockToCsv(blocks: List[Block], messageResponse: MessageResponse)(implicit  ec: ExecutionContext,  mat: Materializer): Future[(ListBuffer[List[String]], MessageResponse)] = {
+   def convertBlockToCsv(blocks: List[Block], messageResponse: MessageResponse)
+                        (implicit  ec: ExecutionContext,  mat: Materializer): Future[(ListBuffer[List[String]], MessageResponse)] = {
       val blocksMap = blocks.map(block => block.getId -> block).toMap
       val tables = blocks.filter(_.getBlockType == "TABLE")
       Source(tables).zipWithIndex.fold(ListBuffer.empty[List[String]])((acc, blockTuple) => {
